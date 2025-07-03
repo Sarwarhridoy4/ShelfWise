@@ -1,5 +1,5 @@
 // src/router.tsx
-import { createBrowserRouter } from "react-router"; // ✅ v7 core
+import { createBrowserRouter } from "react-router";
 // Layout
 import Main from "@/Layout/Main/Main";
 // Top‑level pages
@@ -10,17 +10,13 @@ import BookDetails from "@/pages/Books/BookDetails/BookDetails";
 import BookList from "@/pages/Books/BookList/BookList";
 // Borrowing
 import BorrowSummary from "@/pages/Borrow/BorrowSummary/BorrowSummary";
-// import ErrorPage from "@/components/Shared/ErrorPage/ErrorPage";
+import ErrorPage from "@/components/Shared/ErrorPage/ErrorPage";
 
-// This syntax is not allowed when 'erasableSyntaxOnly' is enabled.ts(1294)
-// Parsing error: '>' expected.eslint
-// Cannot find name 'ErrorPage'.ts(2304)
-// type ErrorPage = /*unresolved*/ any
 export const router = createBrowserRouter([
   {
     path: "/",
     Component: Main,
-    // errorElement: <ErrorPage/>,
+    errorElement: <ErrorPage />,
     children: [
       // Home (index)
       { index: true, Component: Home },
