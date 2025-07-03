@@ -9,7 +9,7 @@
     "paths": {
       "@/*": ["./src/*"]
     },
-    "jsx": "react-jsx",          // or "react-jsxdev" in dev
+    "jsx": "react-jsx",
     "strict": true,
     "erasableSyntaxOnly": false
   }

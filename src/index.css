@@ -114,7 +114,22 @@
   * {
     @apply border-border outline-ring/50;
   }
+
   body {
     @apply bg-background text-foreground;
+  }
+}
+
+/* Animated gradient keyframes (Tailwind v4 consumes this via an
+   arbitrary animation-value class: [animation:gradient-x_4s_ease-in-out_infinite]) */
+@keyframes gradient-x {
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
   }
 }

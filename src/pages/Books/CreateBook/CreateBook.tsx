@@ -1,6 +1,10 @@
 // src/pages/CreateBook.tsx
+import { useCallback } from "react";
 import { useNavigate } from "react-router";
 import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { z } from "zod";
+
 import {
   Form,
   FormField,
@@ -20,39 +24,75 @@ import {
   SelectItem,
 } from "@/components/ui/select";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
+import { toast } from "sonner";
+import { useAddBookMutation } from "@/redux/api/libraryApi";
 
-type NewBookForm = {
-  title: string;
-  author: string;
-  genre: string;
-  isbn: string;
-  description: string;
-  copies: number;
-};
+/* ────────────────── Types & schema ────────────────── */
+const GENRES = [
+  "TECHNICAL",
+  "SELF_HELP",
+  "FICTION",
+  "NON_FICTION",
+  "HISTORY",
+  "BIOGRAPHY",
+  "FANTASY",
+] as const;
 
-const GENRES = ["TECHNICAL", "SELF‑HELP", "FICTION", "NON‑FICTION", "OTHER"];
+const newBookSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  author: z.string().min(1, "Author is required"),
+  genre: z.enum(GENRES, { required_error: "Select a genre" }),
+  isbn: z.string().min(1, "ISBN is required"),
+  description: z.string().optional(),
+  copies: z.coerce.number().int().min(1, "At least one copy"),
+});
 
+type NewBookForm = z.infer<typeof newBookSchema>;
+
+/* ────────────────── Component ────────────────── */
 const CreateBook = () => {
   const navigate = useNavigate();
+  const [addBook, { isLoading }] = useAddBookMutation();
 
   const form = useForm<NewBookForm>({
+    resolver: zodResolver(newBookSchema),
     defaultValues: {
       title: "",
       author: "",
-      genre: "",
+      genre: undefined as unknown as NewBookForm["genre"],
       isbn: "",
       description: "",
       copies: 1,
     },
+    mode: "onBlur",
   });
 
-  const onSubmit = (data: NewBookForm) => {
-    const books = JSON.parse(localStorage.getItem("books") || "[]");
-    const newBook = { ...data, _id: crypto.randomUUID() };
-    localStorage.setItem("books", JSON.stringify([...books, newBook]));
-    form.reset();
-    navigate("/books");
-  };
+  const onSubmit = useCallback(
+    async (data: NewBookForm) => {
+      // optimistic toast: shown immediately, updated later
+      const tId = toast.loading("Adding book…");
+      try {
+        await addBook(data).unwrap();
+        toast.success("Book added successfully 🎉", { id: tId });
+        form.reset();
+        navigate("/books", { replace: true });
+      } catch (err) {
+        toast.error(
+          (err as { data?: { message?: string }; error?: string })?.data
+            ?.message ||
+            (err as { error?: string }).error ||
+            "Failed to add book. Please try again.",
+          { id: tId }
+        );
+      }
+    },
+    [addBook, form, navigate]
+  );
+
+  const {
+    handleSubmit,
+    formState: { isDirty, isValid },
+  } = form;
 
   return (
     <main className='container mx-auto px-4 py-10'>
@@ -64,20 +104,22 @@ const CreateBook = () => {
         <CardContent>
           <Form {...form}>
             <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className='space-y-6'
+              onSubmit={handleSubmit(onSubmit)}
+              className='grid gap-6 md:grid-cols-2'
               noValidate
             >
               {/* Title */}
               <FormField
                 control={form.control}
                 name='title'
-                rules={{ required: "Title is required" }}
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className='md:col-span-2'>
                     <FormLabel>Title *</FormLabel>
                     <FormControl>
-                      <Input placeholder='Clean Code' {...field} />
+                      <Input
+                        placeholder='Sapiens: A Brief History…'
+                        {...field}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -88,12 +130,11 @@ const CreateBook = () => {
               <FormField
                 control={form.control}
                 name='author'
-                rules={{ required: "Author is required" }}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Author *</FormLabel>
                     <FormControl>
-                      <Input placeholder='Robert C. Martin' {...field} />
+                      <Input placeholder='Yuval Noah Harari' {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -104,18 +145,20 @@ const CreateBook = () => {
               <FormField
                 control={form.control}
                 name='genre'
-                rules={{ required: "Select a genre" }}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Genre *</FormLabel>
                     <Select value={field.value} onValueChange={field.onChange}>
-                      <SelectTrigger>
-                        <SelectValue placeholder='Choose…' />
-                      </SelectTrigger>
-                      <SelectContent>
+                      <FormControl>
+                        {/* full‑width trigger */}
+                        <SelectTrigger className='w-full'>
+                          <SelectValue placeholder='Choose…' />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent className='w-full max-w-none'>
                         {GENRES.map((g) => (
                           <SelectItem key={g} value={g}>
-                            {g}
+                            {g.replace("_", " ")}
                           </SelectItem>
                         ))}
                       </SelectContent>
@@ -129,29 +172,28 @@ const CreateBook = () => {
               <FormField
                 control={form.control}
                 name='isbn'
-                rules={{ required: "ISBN is required" }}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>ISBN *</FormLabel>
                     <FormControl>
-                      <Input placeholder='9780132350884' {...field} />
+                      <Input placeholder='9780062316110' {...field} />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}
               />
 
-              {/* Description */}
+              {/* Description – spans full width */}
               <FormField
                 control={form.control}
                 name='description'
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className='md:col-span-2'>
                     <FormLabel>Description</FormLabel>
                     <FormControl>
                       <Textarea
                         rows={4}
-                        placeholder='A handbook of agile software craftsmanship.'
+                        placeholder='Explores the history and impact of Homo sapiens.'
                         {...field}
                       />
                     </FormControl>
@@ -163,10 +205,6 @@ const CreateBook = () => {
               <FormField
                 control={form.control}
                 name='copies'
-                rules={{
-                  required: "Number of copies is required",
-                  min: { value: 1, message: "At least one copy" },
-                }}
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Copies *</FormLabel>
@@ -174,8 +212,9 @@ const CreateBook = () => {
                       <Input
                         type='number'
                         min={1}
+                        inputMode='numeric'
                         {...field}
-                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        onChange={(e) => field.onChange(+e.currentTarget.value)}
                       />
                     </FormControl>
                     <FormMessage />
@@ -183,9 +222,14 @@ const CreateBook = () => {
                 )}
               />
 
-              {/* Actions */}
-              <div className='flex gap-4 pt-2'>
-                <Button type='submit'>Save Book</Button>
+              {/* Actions – full width row */}
+              <div className='md:col-span-2 flex gap-4 pt-2'>
+                <Button
+                  type='submit'
+                  disabled={isLoading || !isDirty || !isValid}
+                >
+                  {isLoading ? "Saving…" : "Save Book"}
+                </Button>
                 <Button
                   type='button'
                   variant='outline'

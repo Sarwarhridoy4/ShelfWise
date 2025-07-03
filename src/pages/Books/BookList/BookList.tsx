@@ -1,5 +1,5 @@
 // src/pages/BookList.tsx
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
 import {
@@ -39,151 +39,49 @@ import {
   SelectContent,
   SelectItem,
 } from "@/components/ui/select";
+import { toast } from "sonner";
 
-/*───────────────────────────────────────────────────────────
- *  Dummy data (15 books) & type
- *───────────────────────────────────────────────────────────*/
-type Book = {
-  _id: string;
-  title: string;
-  author: string;
-  genre: string;
-  isbn: string;
-  copies: number;
-};
+import {
+  useGetBooksQuery,
+  useUpdateBookMutation,
+  useDeleteBookMutation,
+} from "@/redux/api/libraryApi";
+import { type IBook } from "@/redux/api/types";
+import { Skeleton } from "@/components/ui/skeleton";
+import { useAppDispatch, useAppSelector } from "@/redux/store";
+import {
+  setPage,
+  setPerPage,
+  setSortBy,
+  type SortBy,
+} from "@/redux/slices/bookListFiltersSlice";
 
-const initialBooks: Book[] = [
-  {
-    _id: "1",
-    title: "Clean Code",
-    author: "Robert C. Martin",
-    genre: "TECHNICAL",
-    isbn: "9780132350884",
-    copies: 7,
-  },
-  {
-    _id: "2",
-    title: "Atomic Habits",
-    author: "James Clear",
-    genre: "SELF‑HELP",
-    isbn: "9780735211292",
-    copies: 4,
-  },
-  {
-    _id: "3",
-    title: "1984",
-    author: "George Orwell",
-    genre: "FICTION",
-    isbn: "9780451524935",
-    copies: 3,
-  },
-  {
-    _id: "4",
-    title: "The Pragmatic Programmer",
-    author: "Andrew Hunt",
-    genre: "TECHNICAL",
-    isbn: "9780201616224",
-    copies: 5,
-  },
-  {
-    _id: "5",
-    title: "Deep Work",
-    author: "Cal Newport",
-    genre: "SELF‑HELP",
-    isbn: "9781455586691",
-    copies: 6,
-  },
-  {
-    _id: "6",
-    title: "Sapiens",
-    author: "Yuval Noah Harari",
-    genre: "NON‑FICTION",
-    isbn: "9780062316097",
-    copies: 8,
-  },
-  {
-    _id: "7",
-    title: "Thinking, Fast and Slow",
-    author: "Daniel Kahneman",
-    genre: "NON‑FICTION",
-    isbn: "9780374533557",
-    copies: 2,
-  },
-  {
-    _id: "8",
-    title: "To Kill a Mockingbird",
-    author: "Harper Lee",
-    genre: "FICTION",
-    isbn: "9780061120084",
-    copies: 4,
-  },
-  {
-    _id: "9",
-    title: "The Great Gatsby",
-    author: "F. Scott Fitzgerald",
-    genre: "FICTION",
-    isbn: "9780743273565",
-    copies: 1,
-  },
-  {
-    _id: "10",
-    title: "Refactoring",
-    author: "Martin Fowler",
-    genre: "TECHNICAL",
-    isbn: "9780134757599",
-    copies: 5,
-  },
-  {
-    _id: "11",
-    title: "Grit",
-    author: "Angela Duckworth",
-    genre: "SELF‑HELP",
-    isbn: "9781501111112",
-    copies: 7,
-  },
-  {
-    _id: "12",
-    title: "The Alchemist",
-    author: "Paulo Coelho",
-    genre: "FICTION",
-    isbn: "9780061122415",
-    copies: 6,
-  },
-  {
-    _id: "13",
-    title: "Cracking the Coding Interview",
-    author: "Gayle Laakmann McDowell",
-    genre: "TECHNICAL",
-    isbn: "9780984782857",
-    copies: 9,
-  },
-  {
-    _id: "14",
-    title: "Man's Search for Meaning",
-    author: "Viktor E. Frankl",
-    genre: "NON‑FICTION",
-    isbn: "9780807014271",
-    copies: 3,
-  },
-  {
-    _id: "15",
-    title: "Zero to One",
-    author: "Peter Thiel",
-    genre: "BUSINESS",
-    isbn: "9780804139298",
-    copies: 4,
-  },
-];
+/* ─────────────────────────────────────────── */
 
-/*───────────────────────────────────────────────────────────
- *  Component
- *───────────────────────────────────────────────────────────*/
 const BookList = () => {
-  const [books, setBooks] = useState<Book[]>(initialBooks);
+  const {
+    data: booksPayload,
+    isLoading,
+    isError,
+    isFetching,
+  } = useGetBooksQuery(undefined, {
+    refetchOnFocus: true,
+    refetchOnReconnect: true,
+    pollingInterval: 60_000,
+  });
 
-  /* Edit dialog */
-  const [selected, setSelected] = useState<Book | null>(null);
-  const [form, setForm] = useState<Omit<Book, "_id">>({
+  const books = useMemo(() => booksPayload?.data ?? [], [booksPayload]);
+
+  const [updateBook] = useUpdateBookMutation();
+  const [deleteBook] = useDeleteBookMutation();
+
+  const dispatch = useAppDispatch();
+  const { perPage, sortBy, page } = useAppSelector((s) => s.bookListFilters);
+
+  const [selected, setSelected] = useState<IBook | null>(null);
+  const [form, setForm] = useState<
+    Omit<IBook, "_id" | "available" | "createdAt" | "updatedAt">
+  >({
     title: "",
     author: "",
     genre: "",
@@ -191,20 +89,27 @@ const BookList = () => {
     copies: 0,
   });
 
-  /* Pagination & sorting */
-  const [perPage, setPerPage] = useState(5);
-  const [sortBy, setSortBy] = useState<"title" | "author" | "copies">("title");
-  const [page, setPage] = useState(1);
+  useEffect(() => {
+    if (isError) {
+      toast.error("Couldn’t fetch books", {
+        description: "Check your connection and try again.",
+      });
+    }
+  }, [isError]);
 
-  /* Sort + paginate */
-  const sortedBooks = useMemo(
-    () =>
-      [...books].sort((a, b) => {
-        if (sortBy === "copies") return b.copies - a.copies;
-        return a[sortBy].localeCompare(b[sortBy]);
-      }),
-    [books, sortBy]
-  );
+  const sortedBooks = useMemo(() => {
+    const copy = [...books];
+    switch (sortBy) {
+      case "copies":
+        return copy.sort((a, b) => b.copies - a.copies);
+      case "title":
+        return copy.sort((a, b) => a.title.localeCompare(b.title));
+      case "author":
+        return copy.sort((a, b) => a.author.localeCompare(b.author));
+      default:
+        return copy;
+    }
+  }, [books, sortBy]);
 
   const totalPages = Math.max(1, Math.ceil(sortedBooks.length / perPage));
   const currentPageBooks = sortedBooks.slice(
@@ -212,8 +117,11 @@ const BookList = () => {
     page * perPage
   );
 
-  /* Helpers */
-  const openEdit = (book: Book) => {
+  useEffect(() => {
+    if (page > totalPages) dispatch(setPage(totalPages));
+  }, [page, totalPages, dispatch]);
+
+  const openEdit = (book: IBook) => {
     setSelected(book);
     setForm({
       title: book.title,
@@ -224,30 +132,40 @@ const BookList = () => {
     });
   };
 
-  const handleUpdate = () => {
+  const handleUpdate = async () => {
     if (!selected) return;
-    setBooks((prev) =>
-      prev.map((b) => (b._id === selected._id ? { ...selected, ...form } : b))
-    );
-    setSelected(null);
+    try {
+      await updateBook({ id: selected._id, body: form }).unwrap();
+      toast.success("Book updated", { description: `${form.title} saved.` });
+      setSelected(null);
+    } catch (err) {
+      const error = err as { data?: { message?: string } };
+      toast.error("Update failed", {
+        description: error?.data?.message ?? "Unknown error.",
+      });
+    }
   };
 
-  const handleDelete = (id: string) =>
-    setBooks((prev) => prev.filter((b) => b._id !== id));
+  const handleDelete = async (id: string) => {
+    try {
+      await deleteBook(id).unwrap();
+      toast.success("Book deleted");
+    } catch (err) {
+      const error = err as { data?: { message?: string } };
+      toast.error("Delete failed", {
+        description: error?.data?.message ?? "Unknown error.",
+      });
+    }
+  };
 
-  /* Render */
   return (
     <div className='container mx-auto px-4 py-10'>
       <h2 className='mb-6 text-2xl font-bold'>Books</h2>
 
-      {/* Controls */}
-      <div className='mb-4 flex flex-wrap gap-4 items-center'>
+      <div className='mb-4 flex flex-wrap items-center gap-4'>
         <Select
           value={String(perPage)}
-          onValueChange={(v) => {
-            setPerPage(Number(v));
-            setPage(1);
-          }}
+          onValueChange={(v) => dispatch(setPerPage(Number(v)))}
         >
           <SelectTrigger className='w-[120px]'>
             <SelectValue placeholder='Per page' />
@@ -263,10 +181,7 @@ const BookList = () => {
 
         <Select
           value={sortBy}
-          onValueChange={(v) => {
-            setSortBy(v as "title" | "author" | "copies");
-            setPage(1);
-          }}
+          onValueChange={(v) => dispatch(setSortBy(v as SortBy))}
         >
           <SelectTrigger className='w-[140px]'>
             <SelectValue placeholder='Sort by' />
@@ -279,7 +194,6 @@ const BookList = () => {
         </Select>
       </div>
 
-      {/* Table */}
       <Table className='overflow-x-auto'>
         <TableHeader>
           <TableRow>
@@ -294,129 +208,138 @@ const BookList = () => {
         </TableHeader>
 
         <TableBody>
-          {currentPageBooks.map((book) => (
-            <TableRow key={book._id}>
-              <TableCell className='font-medium'>{book.title}</TableCell>
-              <TableCell>{book.author}</TableCell>
-              <TableCell>{book.genre}</TableCell>
-              <TableCell>{book.isbn}</TableCell>
-              <TableCell className='text-right'>{book.copies}</TableCell>
-              <TableCell className='text-center'>
-                {book.copies > 0 ? "✅" : "❌"}
-              </TableCell>
+          {isLoading || isFetching
+            ? Array.from({ length: perPage }).map((_, i) => (
+                <TableRow key={`loading-${i}`}>
+                  {Array.from({ length: 7 }).map((_, j) => (
+                    <TableCell key={j}>
+                      <Skeleton className='h-4 w-full' />
+                    </TableCell>
+                  ))}
+                </TableRow>
+              ))
+            : currentPageBooks.map((book) => (
+                <TableRow key={book._id}>
+                  <TableCell className='font-medium'>{book.title}</TableCell>
+                  <TableCell>{book.author}</TableCell>
+                  <TableCell>{book.genre}</TableCell>
+                  <TableCell>{book.isbn}</TableCell>
+                  <TableCell className='text-right'>{book.copies}</TableCell>
+                  <TableCell className='text-center'>
+                    {book.available ? "✅" : "❌"}
+                  </TableCell>
+                  <TableCell className='flex flex-wrap justify-center gap-2'>
+                    <Button asChild size='sm'>
+                      <Link to={`/books/${book._id}`}>Borrow</Link>
+                    </Button>
 
-              {/* Actions */}
-              <TableCell className='flex flex-wrap justify-center gap-2'>
-                {/* Borrow Link */}
-                <Button asChild size='sm'>
-                  <Link to={`/books/${book._id}`}>Borrow</Link>
-                </Button>
-
-                {/* Edit Dialog */}
-                <Dialog
-                  open={selected?._id === book._id}
-                  onOpenChange={(o) => !o && setSelected(null)}
-                >
-                  <DialogTrigger asChild>
-                    <Button
-                      size='sm'
-                      variant='secondary'
-                      onClick={() => openEdit(book)}
+                    <Dialog
+                      open={selected?._id === book._id}
+                      onOpenChange={(open) => !open && setSelected(null)}
                     >
-                      Edit
-                    </Button>
-                  </DialogTrigger>
-                  <DialogContent className='sm:max-w-[480px]'>
-                    <DialogHeader>
-                      <DialogTitle>Edit “{selected?.title}”</DialogTitle>
-                      <DialogDescription>
-                        Update fields and press Save.
-                      </DialogDescription>
-                    </DialogHeader>
-                    <div className='grid gap-4 py-4'>
-                      <Input
-                        placeholder='Title'
-                        value={form.title}
-                        onChange={(e) =>
-                          setForm({ ...form, title: e.target.value })
-                        }
-                      />
-                      <Input
-                        placeholder='Author'
-                        value={form.author}
-                        onChange={(e) =>
-                          setForm({ ...form, author: e.target.value })
-                        }
-                      />
-                      <Input
-                        placeholder='Genre'
-                        value={form.genre}
-                        onChange={(e) =>
-                          setForm({ ...form, genre: e.target.value })
-                        }
-                      />
-                      <Input
-                        placeholder='ISBN'
-                        value={form.isbn}
-                        onChange={(e) =>
-                          setForm({ ...form, isbn: e.target.value })
-                        }
-                      />
-                      <Input
-                        type='number'
-                        placeholder='Copies'
-                        value={form.copies}
-                        onChange={(e) =>
-                          setForm({ ...form, copies: Number(e.target.value) })
-                        }
-                      />
-                    </div>
-                    <DialogFooter>
-                      <DialogClose asChild>
-                        <Button variant='outline'>Cancel</Button>
-                      </DialogClose>
-                      <Button onClick={handleUpdate}>Save</Button>
-                    </DialogFooter>
-                  </DialogContent>
-                </Dialog>
+                      <DialogTrigger asChild>
+                        <Button
+                          size='sm'
+                          variant='secondary'
+                          onClick={() => openEdit(book)}
+                        >
+                          Edit
+                        </Button>
+                      </DialogTrigger>
+                      <DialogContent className='sm:max-w-[480px]'>
+                        <DialogHeader>
+                          <DialogTitle>Edit “{selected?.title}”</DialogTitle>
+                          <DialogDescription>
+                            Update fields and press Save.
+                          </DialogDescription>
+                        </DialogHeader>
+                        <div className='grid gap-4 py-4'>
+                          <Input
+                            placeholder='Title'
+                            value={form.title}
+                            onChange={(e) =>
+                              setForm({ ...form, title: e.target.value })
+                            }
+                          />
+                          <Input
+                            placeholder='Author'
+                            value={form.author}
+                            onChange={(e) =>
+                              setForm({ ...form, author: e.target.value })
+                            }
+                          />
+                          <Input
+                            placeholder='Genre'
+                            value={form.genre}
+                            onChange={(e) =>
+                              setForm({ ...form, genre: e.target.value })
+                            }
+                          />
+                          <Input
+                            placeholder='ISBN'
+                            value={form.isbn}
+                            onChange={(e) =>
+                              setForm({ ...form, isbn: e.target.value })
+                            }
+                          />
+                          <Input
+                            type='number'
+                            placeholder='Copies'
+                            value={form.copies}
+                            onChange={(e) =>
+                              setForm({
+                                ...form,
+                                copies: Math.max(0, Number(e.target.value)),
+                              })
+                            }
+                          />
+                        </div>
+                        <DialogFooter>
+                          <DialogClose asChild>
+                            <Button variant='outline'>Cancel</Button>
+                          </DialogClose>
+                          <Button onClick={handleUpdate}>Save</Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
 
-                {/* Delete Dialog */}
-                <AlertDialog>
-                  <AlertDialogTrigger asChild>
-                    <Button size='sm' variant='destructive'>
-                      Delete
-                    </Button>
-                  </AlertDialogTrigger>
-                  <AlertDialogContent>
-                    <AlertDialogHeader>
-                      <AlertDialogTitle>
-                        Delete “{book.title}”?
-                      </AlertDialogTitle>
-                      <AlertDialogDescription>
-                        This action cannot be undone.
-                      </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                      <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => handleDelete(book._id)}>
-                        Confirm
-                      </AlertDialogAction>
-                    </AlertDialogFooter>
-                  </AlertDialogContent>
-                </AlertDialog>
-              </TableCell>
-            </TableRow>
-          ))}
+                    <AlertDialog>
+                      <AlertDialogTrigger asChild>
+                        <Button size='sm' variant='destructive'>
+                          Delete
+                        </Button>
+                      </AlertDialogTrigger>
+                      <AlertDialogContent>
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Delete “{book.title}”?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action cannot be undone.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel>Cancel</AlertDialogCancel>
+                          <AlertDialogAction
+                            onClick={() => handleDelete(book._id)}
+                          >
+                            Confirm
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
+                  </TableCell>
+                </TableRow>
+              ))}
         </TableBody>
       </Table>
 
-      {/* Pagination */}
       <div className='mt-6 flex justify-center gap-2'>
         <Button
           size='sm'
           variant='outline'
           disabled={page === 1}
-          onClick={() => setPage((p) => p - 1)}
+          onClick={() => dispatch(setPage(page - 1))}
         >
           Prev
         </Button>
@@ -425,7 +348,7 @@ const BookList = () => {
             key={p}
             size='sm'
             variant={p === page ? "default" : "outline"}
-            onClick={() => setPage(p)}
+            onClick={() => dispatch(setPage(p))}
           >
             {p}
           </Button>
@@ -434,7 +357,7 @@ const BookList = () => {
           size='sm'
           variant='outline'
           disabled={page === totalPages}
-          onClick={() => setPage((p) => p + 1)}
+          onClick={() => dispatch(setPage(page + 1))}
         >
           Next
         </Button>

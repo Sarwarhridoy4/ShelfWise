@@ -6,6 +6,8 @@ import { router } from "./router/router.ts";
 import { Provider } from "react-redux";
 import { store } from "./redux/store.ts";
 import { ThemeProvider } from "./components/theme-provide.tsx";
+import { Toaster } from "./components/ui/sonner.tsx";
+import { SmoothCursor } from "./components/ui/smooth-cursor.tsx";
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>
@@ -15,6 +17,8 @@ createRoot(document.getElementById("root")!).render(
       <ThemeProvider defaultTheme='system' storageKey='vite-ui-theme'>
         {/*React Router Setup */}
         <RouterProvider router={router} />
+        <Toaster richColors />
+        <SmoothCursor />
       </ThemeProvider>
     </Provider>
   </StrictMode>
