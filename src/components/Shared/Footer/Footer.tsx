@@ -1,6 +1,6 @@
 // src/components/Footer.tsx
 import { Link } from "react-router";
-import { Github, Twitter, Mail } from "lucide-react";
+import { Github, Mail, Linkedin } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
@@ -57,7 +57,7 @@ export default function Footer() {
             <div className='flex gap-2'>
               <Button asChild size='icon' variant='ghost' aria-label='GitHub'>
                 <a
-                  href='https://github.com/your‑org/shelfwise'
+                  href='https://github.com/Sarwarhridoy4'
                   target='_blank'
                   rel='noreferrer'
                 >
@@ -66,15 +66,15 @@ export default function Footer() {
               </Button>
               <Button asChild size='icon' variant='ghost' aria-label='Twitter'>
                 <a
-                  href='https://twitter.com/yourhandle'
+                  href='https://www.linkedin.com/in/sarwar-hridoy4'
                   target='_blank'
                   rel='noreferrer'
                 >
-                  <Twitter className='h-5 w-5' />
+                  <Linkedin className='h-5 w-5' />
                 </a>
               </Button>
               <Button asChild size='icon' variant='ghost' aria-label='Email'>
-                <a href='mailto:hello@shelfwise.dev'>
+                <a href='mailto:sarwarhridoy4@gmail.com'>
                   <Mail className='h-5 w-5' />
                 </a>
               </Button>
