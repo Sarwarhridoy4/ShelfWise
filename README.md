@@ -17,9 +17,7 @@
 * 🔄 Borrow books with automatic stock tracking
 * 📊 See a summary of all borrowing activities
 
-There is no authentication system — the focus is on mastering **MVC architecture**, **RESTful APIs**, **data modeling with Mongoose**, and **real-world state management with RTK Query** on the frontend.
-
-The backend is built with a **modular, scalable TypeScript structure** and uses **Zod** for safe validation, **Mongoose instance methods** for logic, and **MongoDB aggregations** for reporting.
+There is no authentication system — the focus is on mastering **MVC architecture**, **RESTful APIs**, **data modeling with Mongoose**, and **real-world state management with RTK Query** on the frontend. The backend is built with a **modular, scalable TypeScript structure** and uses **Zod** for safe validation, **Mongoose instance methods** for logic, and **MongoDB aggregations** for reporting.
 ---
 
 
