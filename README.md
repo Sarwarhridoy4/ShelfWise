@@ -1,1 +1,51 @@
-# ShelfWise
+# 📚 ShelfWise - Organize, Manage, Borrow — Wisely.
+
+## 🔗 Live Demo (Frontend)
+
+Check out the ShelfWise live in action:
+**[View ShelfWise Live](hhttps://shelf-wise-two.vercel.app)**
+
+---
+
+## 1. Project Overview
+
+### 🖥️ ShelfWise (Client)
+
+A modern, responsive single-page application built with React and Redux. ShelfWise empowers users to:
+
+- View a catalog of books
+- Search, filter, sort, and browse book details
+- See real-time availability statuses
+- Allow user to borrow a book
+- Allow user to edit/update book
+- Show Toast with proper message
+- Show Borrow summary in grid card view
+- Modern Theme
+
+It's a user-friendly frontend that consumes the MVC server’s RESTful APIs.
+
+### 🛠️ Library‑Management‑MVC‑Server (Backend)
+
+A REST API built using Node.js, Express, and MongoDB (via Mongoose). It powers ShelfWise by providing endpoints to:
+
+- Perform CRUD operations on books
+- Track borrowing of books without user authentication
+- Keep track of books availabilities and update status accordingly
+
+The architecture follows an MVC pattern, keeping routes, controllers, and models organized.
+
+---
+
+## 2. Tech Stack
+
+| Layer          | Technologies                                           |
+| -------------- | ------------------------------------------------------ |
+| **Frontend**   | React With Redux, ShadCn UI Powered by Tailwind 4 |
+| **Backend**    | Node.js, Express, MongoDB, Mongoose,Jod                   |
+| **Dev Tools**  | ESLint, Prettier, nodemon, Postman/Insomnia            |
+| **DB Hosting** | MongoDB Atlas                       |
+| **Deployment** | Vercel (frontend), Vercel (backend) |
+
+---
+
+
