@@ -8,6 +8,18 @@
 
 ---
 
+## 📖 What is this project about?
+
+**ShelfWise** is a minimal and modern full-stack **Library Management System** built using **React**, **TypeScript**, **Node.js**, **Express**, and **MongoDB**. It allows users to:
+
+* 📚 Browse and filter a collection of books
+* 🔍 View book details with real-time availability
+* 🔄 Borrow books with automatic stock tracking
+* 📊 See a summary of all borrowing activities
+---
+
+There is no authentication system — the focus is on mastering **MVC architecture**, **RESTful APIs**, **data modeling with Mongoose**, and **real-world state management with RTK Query** on the frontend. The backend is built with a **modular, scalable TypeScript structure** and uses **Zod** for safe validation, **Mongoose instance methods** for logic, and **MongoDB aggregations** for reporting.
+
 ## 1. Project Overview
 
 ### 🖥️ ShelfWise (Client)
