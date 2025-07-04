@@ -64,6 +64,11 @@ import {
   type SortBy,
 } from "@/redux/slices/bookListFiltersSlice";
 import { Label } from "@/components/ui/label";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 
 /* ─────────────────────────────────────────── */
 
@@ -270,7 +275,18 @@ const BookList = () => {
             ? skeletonRows
             : sortedBooks.map((book) => (
                 <TableRow key={book._id}>
-                  <TableCell className='font-medium'>{book.title}</TableCell>
+                  <Tooltip>
+                    <TooltipTrigger asChild>
+                      <TableCell className='max-w-[200px] truncate'>
+                        {book?.title.length > 25
+                          ? `${book?.title.slice(0, 25)}...`
+                          : `${book?.title}`}
+                      </TableCell>
+                    </TooltipTrigger>
+                    <TooltipContent>
+                      <span>{book.title}</span>
+                    </TooltipContent>
+                  </Tooltip>
                   <TableCell>{book.author}</TableCell>
                   <TableCell>{book.genre}</TableCell>
                   <TableCell>{book.isbn}</TableCell>
