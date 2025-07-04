@@ -86,7 +86,14 @@ export default function Navbar() {
               </Button>
             </SheetTrigger>
 
-            <SheetContent side='right' className='w-64'>
+            <SheetContent side='right' className='w-64 p-4'>
+              {/* Logo */}
+              <Link
+                to='/'
+                className='text-2xl font-bold tracking-tight hover:opacity-90 transition-opacity mx-5 my-4'
+              >
+                ShelfWise
+              </Link>
               <nav className='grid gap-4 py-4'>
                 {links.map(({ to, label }) => (
                   <NavLink key={to} to={to} className={mobileNavClasses}>
