@@ -9,7 +9,7 @@ Check out the ShelfWise live in action:
 ## 🔗 Live Demo (Backend)
 
 Check out the ShelfWise live in action:
-**[Access ShelfWise API  Live](https://library-management-server-redux.vercel.app/)**
+[Access ShelfWise API  Live]**(https://library-management-server-redux.vercel.app/)**
 ---
 
 ## 1. Project Overview
