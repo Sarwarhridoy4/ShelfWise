@@ -44,6 +44,7 @@ export default function Navbar() {
     { to: "/", label: "Home" },
     { to: "/books", label: "Books" },
     { to: "/borrow-summary", label: "Summary" },
+    { to: "/create-book", label: "Add a New Book" },
   ];
 
   return (
