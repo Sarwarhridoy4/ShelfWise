@@ -1,15 +1,11 @@
 # 📚 ShelfWise - Organize, Manage, Borrow — Wisely.
 
-## 🔗 Live Demo (Frontend)
+## 🔗 Live Demo
 
-Check out the ShelfWise live in action:
-**[View ShelfWise Live](https://shelf-wise-two.vercel.app)**
+[![🖥️ View ShelfWise Live](https://img.shields.io/badge/ShelfWise-Frontend-blue?style=for-the-badge&logo=vercel)](https://shelf-wise-two.vercel.app)
 
+[![🛠️ Access ShelfWise API](https://img.shields.io/badge/ShelfWise-Backend-green?style=for-the-badge&logo=vercel)](https://library-management-server-redux.vercel.app)
 
-## 🔗 Live Demo (Backend)
-
-Check out the ShelfWise live in action:
-[Access ShelfWise API  Live]**(https://library-management-server-redux.vercel.app/)**
 ---
 
 ## 1. Project Overview
