@@ -42,7 +42,7 @@ The architecture follows an MVC pattern, keeping routes, controllers, and models
 | -------------- | ------------------------------------------------------ |
 | **Frontend**   | React With Redux, ShadCn UI Powered by Tailwind 4 |
 | **Backend**    | Node.js, Express, MongoDB, Mongoose,Jod                   |
-| **Dev Tools**  | ESLint, Prettier, nodemon, Postman/Insomnia            |
+| **Dev Tools**  | ESLint, Prettier, nodemon, Postman            |
 | **DB Hosting** | MongoDB Atlas                       |
 | **Deployment** | Vercel (frontend), Vercel (backend) |
 
