@@ -1,7 +1,8 @@
-// src/pages/BookDetails.tsx
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* src/pages/Books/BookDetails/BookDetails.tsx */
 import { Link, useNavigate, useParams } from "react-router";
 import { useForm } from "react-hook-form";
-
+import { format } from "date-fns";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -36,46 +37,57 @@ import {
   PopoverTrigger,
   PopoverContent,
 } from "@/components/ui/popover";
-import { format } from "date-fns";
 import { cn } from "@/lib/utils";
 
-/* ─────────────────────────── */
-/* Helper types & utils        */
-/* ─────────────────────────── */
+/* ------------------------------------------------------------------ */
+/*                           Type Declarations                         */
+/* ------------------------------------------------------------------ */
 
-type BorrowForm = {
+interface BorrowFormValues {
   quantity: number;
-  /** Actual JS Date selected in the calendar */
-  dueDate: Date | undefined;
-};
-
-interface ApiError {
-  data?: { message?: string };
-  error?: string;
+  dueDate: Date | null;
 }
 
+const isDate = (v: unknown): v is Date => v instanceof Date;
+
+/* ------------------------------------------------------------------ */
+/*                         Utility Functions                           */
+/* ------------------------------------------------------------------ */
+
 const getErrorMessage = (err: unknown): string => {
-  if (err && typeof err === "object" && ("data" in err || "error" in err)) {
-    const apiErr = err as ApiError;
-    return (
-      apiErr.data?.message ??
-      apiErr.error ??
-      "Something went wrong. Please try again."
-    );
+  if (typeof err === "string") return err;
+
+  if (
+    typeof err === "object" &&
+    err !== null &&
+    "data" in err &&
+    typeof (err as any).data?.message === "string"
+  ) {
+    return (err as any).data.message as string;
   }
+
+  if (
+    typeof err === "object" &&
+    err !== null &&
+    "error" in err &&
+    typeof (err as any).error === "string"
+  ) {
+    return (err as any).error as string;
+  }
+
   return "Something went wrong. Please try again.";
 };
 
-/* ─────────────────────────── */
-/* Component                   */
-/* ─────────────────────────── */
+/* ------------------------------------------------------------------ */
+/*                          Component Body                             */
+/* ------------------------------------------------------------------ */
 
-const BookDetails = () => {
-  /* URL param */
-  const { id } = useParams<{ id: string }>(); // ✅ correct generic
+const BookDetails: React.FC = () => {
+  /* routing */
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  /* Queries & mutations */
+  /* queries */
   const {
     data: bookWrapper,
     isLoading,
@@ -84,19 +96,19 @@ const BookDetails = () => {
 
   const [borrowBook, { isLoading: isBorrowing }] = useBorrowBookMutation();
 
-  /* Borrow form */
-  const borrowForm = useForm<BorrowForm>({
-    defaultValues: { quantity: 1, dueDate: undefined },
+  /* form */
+  const borrowForm = useForm<BorrowFormValues>({
+    defaultValues: { quantity: 1, dueDate: null },
   });
 
-  const borrowSubmit = async (values: BorrowForm) => {
-    if (!bookWrapper?.data || !values.dueDate) return;
+  const borrowSubmit = async (values: BorrowFormValues) => {
+    const book = bookWrapper?.data;
+    if (!book || !values.dueDate) return;
 
     try {
       await borrowBook({
-        book: bookWrapper.data._id,
+        book: book._id,
         quantity: values.quantity,
-        // backend expects YYYY‑MM‑DD
         dueDate: format(values.dueDate, "yyyy-MM-dd"),
       }).unwrap();
 
@@ -108,7 +120,7 @@ const BookDetails = () => {
     }
   };
 
-  /* Loading & error states */
+  /* loading / error states */
   if (isLoading) {
     return (
       <main className='container mx-auto px-4 py-10'>
@@ -128,48 +140,55 @@ const BookDetails = () => {
     );
   }
 
-  /* Success: book is defined */
+  /* ---------------------------------------------------------------- */
+  /*                             Render                                */
+  /* ---------------------------------------------------------------- */
   const { title, author, genre, isbn, description, copies, available } =
     bookWrapper.data;
 
   return (
     <main className='container mx-auto px-4 py-10'>
       <Card className='mx-auto max-w-4xl shadow-lg'>
-        {/* Header */}
-        <CardHeader className='flex flex-row gap-6'>
+        <CardHeader className='flex flex-col sm:flex-row items-center sm:items-start gap-6'>
           <img
-            src={`https://placehold.co/240x360/png?text=${title}`}
+            src={`https://placehold.co/240x360/png?text=${encodeURIComponent(
+              title
+            )}`}
             alt={`${title} cover`}
-            className='h-60 w-40 object-cover rounded-md border'
+            className='w-full max-w-[160px] sm:w-40 sm:h-60 object-cover rounded-md border'
           />
 
-          <div className='flex flex-col justify-between flex-1 my-5'>
-            <div>
+          <div className='flex flex-col justify-between flex-1 mt-4 sm:mt-5'>
+            {/* Title & badges */}
+            <div className='text-center sm:text-left'>
               <CardTitle className='text-2xl'>{title}</CardTitle>
               <p className='text-muted-foreground mb-2'>by {author}</p>
 
-              <div className='flex flex-wrap gap-2 my-5'>
+              <div className='flex flex-wrap justify-center sm:justify-start gap-2 mt-4 sm:my-5'>
                 <Badge variant='secondary'>{genre}</Badge>
                 <Badge>{available ? "Available" : "Out of stock"}</Badge>
               </div>
             </div>
 
-            <div className='flex gap-4 text-sm'>
+            {/* copies / availability */}
+            <div className='flex flex-col sm:flex-row items-center sm:items-start gap-1 sm:gap-4 text-sm mt-4'>
               <span>
                 Total copies: <strong>{copies}</strong>
               </span>
-              <Separator orientation='vertical' />
+              <Separator orientation='vertical' className='hidden sm:inline' />
               <span>
-                Available: <strong>{`${available?"YES":"NO"}`}</strong>
+                Available: <strong>{available ? "YES" : "NO"}</strong>
               </span>
             </div>
 
-            {/* Action buttons */}
-            <div className='mt-4 flex gap-4'>
+            {/* action buttons */}
+            <div className='mt-4 flex flex-col sm:flex-row gap-2 sm:gap-4 w-full'>
               {/* Borrow dialog */}
               <Dialog>
                 <DialogTrigger asChild>
-                  <Button disabled={!available}>Borrow Book</Button>
+                  <Button className='w-full sm:w-auto' disabled={!available}>
+                    Borrow Book
+                  </Button>
                 </DialogTrigger>
 
                 <DialogContent className='sm:max-w-md'>
@@ -185,8 +204,8 @@ const BookDetails = () => {
                       onSubmit={borrowForm.handleSubmit(borrowSubmit)}
                       className='space-y-4'
                     >
-                      {/* Quantity */}
-                      <FormField
+                      {/* Quantity field */}
+                      <FormField<BorrowFormValues, "quantity">
                         control={borrowForm.control}
                         name='quantity'
                         rules={{
@@ -211,15 +230,14 @@ const BookDetails = () => {
                         )}
                       />
 
-                      {/* Due date */}
-                      <FormField
+                      {/* Due‑date field */}
+                      <FormField<BorrowFormValues, "dueDate">
                         control={borrowForm.control}
                         name='dueDate'
                         rules={{ required: "Due date is required" }}
                         render={({ field }) => (
                           <FormItem className='flex flex-col'>
                             <FormLabel>Due Date</FormLabel>
-
                             <Popover>
                               <PopoverTrigger asChild>
                                 <FormControl>
@@ -230,35 +248,44 @@ const BookDetails = () => {
                                       !field.value && "text-muted-foreground"
                                     )}
                                   >
-                                    {field.value
+                                    {isDate(field.value)
                                       ? format(field.value, "PPP")
                                       : "Pick a date"}
                                   </Button>
                                 </FormControl>
                               </PopoverTrigger>
-
                               <PopoverContent
                                 className='p-0 w-auto'
                                 align='start'
                               >
                                 <Calendar
                                   mode='single'
-                                  selected={field.value}
-                                  onSelect={field.onChange}
+                                  selected={
+                                    isDate(field.value)
+                                      ? field.value
+                                      : undefined
+                                  }
+                                  onSelect={(date) =>
+                                    field.onChange(date ?? null)
+                                  }
                                   initialFocus
-                                  disabled={(date: Date) => date < new Date()}
+                                  disabled={(date) => date < new Date()}
                                 />
                               </PopoverContent>
                             </Popover>
-
                             <FormMessage />
                           </FormItem>
                         )}
                       />
 
+                      {/* footer */}
                       <DialogFooter className='mt-4'>
                         <DialogClose asChild>
-                          <Button type='button' variant='outline'>
+                          <Button
+                            type='button'
+                            variant='outline'
+                            disabled={isBorrowing}
+                          >
                             Cancel
                           </Button>
                         </DialogClose>
@@ -271,7 +298,8 @@ const BookDetails = () => {
                 </DialogContent>
               </Dialog>
 
-              <Button asChild variant='outline'>
+              {/* back button */}
+              <Button asChild variant='outline' className='w-full sm:w-auto'>
                 <Link to='/books'>Back to List</Link>
               </Button>
             </div>
@@ -295,7 +323,7 @@ const BookDetails = () => {
               <p className='leading-relaxed'>{description}</p>
             </TabsContent>
 
-            {/* Meta tab */}
+            {/* Metadata tab */}
             <TabsContent value='meta'>
               <div className='grid grid-cols-2 sm:grid-cols-3 gap-4 text-sm'>
                 <div>
@@ -312,7 +340,7 @@ const BookDetails = () => {
                 </div>
                 <div>
                   <p className='text-muted-foreground'>Available</p>
-                  <p>{available?"Available":"Not Available"}</p>
+                  <p>{available ? "Available" : "Not Available"}</p>
                 </div>
                 <div className='col-span-full flex items-center gap-2'>
                   <BookOpen className='h-4 w-4' />

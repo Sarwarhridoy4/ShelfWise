@@ -8,6 +8,7 @@ import type {
   IBorrowRecord,
   IGetBookResponse,
   IGetBooksResponse,
+  IPaginatedMeta,
 } from "./types";
 
 export const libraryApi = createApi({
@@ -21,21 +22,44 @@ export const libraryApi = createApi({
   endpoints: (builder) => ({
     /* ───────────── BOOKS ───────────── */
 
-    // GET /books
-    getBooks: builder.query<IGetBooksResponse, IBookQuery | void>({
+    /* GET /books */
+    getBooks: builder.query<
+      /* what the hook returns to the component */
+      { books: IBook[]; meta: IPaginatedMeta },
+      IBookQuery | void
+    >({
       query: (params) => {
+        /* stringify — numbers ➔ strings & undefined filtered out */
         const qs =
           params && Object.keys(params).length
             ? `?${new URLSearchParams(
-                params as string | Record<string, string>
+                Object.entries(params).reduce<Record<string, string>>(
+                  (acc, [k, v]) => {
+                    if (v !== undefined && v !== null) acc[k] = String(v);
+                    return acc;
+                  },
+                  {}
+                )
               )}`
             : "";
-        return `/books${qs}`;
+
+        return `/books${qs}`; // → /books?sort=asc&limit=2&page=2
       },
+
+      /* expose meta + keep the array for tags */
+      transformResponse: (res: IGetBooksResponse) => ({
+        books: res.data,
+        meta: {
+          page: res.meta.currentPage,
+          limit: res.meta.limit,
+          total: res.meta.totalItems,
+        },
+      }),
+
       providesTags: (result) =>
         result
           ? [
-              ...result.data.map(({ _id }) => ({
+              ...result.books.map(({ _id }) => ({
                 type: "Book" as const,
                 id: _id,
               })),

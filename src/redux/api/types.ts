@@ -74,3 +74,24 @@ export interface IGetBookResponse {
   message: string;
   data: IBook;
 }
+
+export type ISort = {
+  sort: "asc" | "desc";
+};
+
+/* ─── Query params you can send to GET /books ─── */
+export interface IBookQuery {
+  page?: number; // 1‑based page index
+  limit?: number; // docs per page
+  sort?: "asc" | "desc"; // ascending / descending by createdAt
+  search?: string; // full‑text search
+  genre?: string;
+  author?: string;
+}
+
+/* ─── Generic meta block returned by the server ─── */
+export interface IPaginatedMeta {
+  page: number;
+  limit: number;
+  total: number;
+}
