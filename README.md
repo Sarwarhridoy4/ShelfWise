@@ -3,8 +3,13 @@
 ## 🔗 Live Demo (Frontend)
 
 Check out the ShelfWise live in action:
-**[View ShelfWise Live](hhttps://shelf-wise-two.vercel.app)**
+**[View ShelfWise Live](https://shelf-wise-two.vercel.app)**
 
+
+## 🔗 Live Demo (Backend)
+
+Check out the ShelfWise live in action:
+**[Access ShelfWise API  Live](https://library-management-server-redux.vercel.app/)**
 ---
 
 ## 1. Project Overview
