@@ -115,7 +115,7 @@ const CreateBook = () => {
                 control={form.control}
                 name='author'
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className='md:col-span-2'>
                     <FormLabel>Author *</FormLabel>
                     <FormControl>
                       <Input placeholder='Yuval Noah Harari' {...field} />
@@ -148,7 +148,7 @@ const CreateBook = () => {
                 control={form.control}
                 name='isbn'
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className='md:col-span-2'>
                     <FormLabel>ISBN *</FormLabel>
                     <FormControl>
                       <Input placeholder='9780062316110' {...field} />
@@ -181,7 +181,7 @@ const CreateBook = () => {
                 control={form.control}
                 name='copies'
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className='md:col-span-2'>
                     <FormLabel>Copies *</FormLabel>
                     <FormControl>
                       <Input
