@@ -16,32 +16,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectTrigger,
-  SelectValue,
-  SelectContent,
-  SelectItem,
-} from "@/components/ui/select";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { toast } from "sonner";
 import { useAddBookMutation } from "@/redux/api/libraryApi";
 
 /* ────────────────── Types & schema ────────────────── */
-const GENRES = [
-  "TECHNICAL",
-  "SELF_HELP",
-  "FICTION",
-  "NON_FICTION",
-  "HISTORY",
-  "BIOGRAPHY",
-  "FANTASY",
-] as const;
 
 const newBookSchema = z.object({
   title: z.string().min(1, "Title is required"),
   author: z.string().min(1, "Author is required"),
-  genre: z.enum(GENRES, { required_error: "Select a genre" }),
+  genre: z.string().min(1, "Genre is required"),
   isbn: z.string().min(1, "ISBN is required"),
   description: z.string().optional(),
   copies: z.coerce.number().int().min(1, "At least one copy"),
@@ -146,23 +130,14 @@ const CreateBook = () => {
                 control={form.control}
                 name='genre'
                 render={({ field }) => (
-                  <FormItem>
+                  <FormItem className='md:col-span-2'>
                     <FormLabel>Genre *</FormLabel>
-                    <Select value={field.value} onValueChange={field.onChange}>
-                      <FormControl>
-                        {/* full‑width trigger */}
-                        <SelectTrigger className='w-full'>
-                          <SelectValue placeholder='Choose…' />
-                        </SelectTrigger>
-                      </FormControl>
-                      <SelectContent className='w-full max-w-none'>
-                        {GENRES.map((g) => (
-                          <SelectItem key={g} value={g}>
-                            {g.replace("_", " ")}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
+                    <FormControl>
+                      <Input
+                        placeholder='eg. Non-fiction, History'
+                        {...field}
+                      />
+                    </FormControl>
                     <FormMessage />
                   </FormItem>
                 )}

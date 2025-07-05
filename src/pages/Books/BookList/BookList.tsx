@@ -274,7 +274,7 @@ const BookList = () => {
           {isLoading || isFetching
             ? skeletonRows
             : sortedBooks.map((book) => (
-                <TableRow key={book._id}>
+                <TableRow key={book?._id}>
                   <Tooltip>
                     <TooltipTrigger asChild>
                       <TableCell className='max-w-[200px] truncate'>
@@ -284,27 +284,27 @@ const BookList = () => {
                       </TableCell>
                     </TooltipTrigger>
                     <TooltipContent>
-                      <span>{book.title}</span>
+                      <span>{book?.title}</span>
                     </TooltipContent>
                   </Tooltip>
-                  <TableCell>{book.author}</TableCell>
-                  <TableCell>{book.genre}</TableCell>
-                  <TableCell>{book.isbn}</TableCell>
+                  <TableCell>{book?.author}</TableCell>
+                  <TableCell>{book?.genre}</TableCell>
+                  <TableCell>{book?.isbn}</TableCell>
                   <TableCell className='text-right'>{book.copies}</TableCell>
                   <TableCell className='text-center'>
-                    {book.available ? "✅" : "❌"}
+                    {book?.available ? "✅" : "❌"}
                   </TableCell>
 
                   {/* Actions */}
                   <TableCell className='flex flex-wrap justify-center gap-2'>
                     {/* Borrow link */}
                     <Button asChild size='sm'>
-                      <Link to={`/books/${book._id}`}>View/Borrow</Link>
+                      <Link to={`/books/${book?._id}`}>View/Borrow</Link>
                     </Button>
 
                     {/* Edit dialog */}
                     <Dialog
-                      open={selected?._id === book._id}
+                      open={selected?._id === book?._id}
                       onOpenChange={(open) => !open && setSelected(null)}
                     >
                       <DialogTrigger asChild>
@@ -395,7 +395,7 @@ const BookList = () => {
                       <AlertDialogContent>
                         <AlertDialogHeader>
                           <AlertDialogTitle>
-                            Delete “{book.title}”?
+                            Delete “{book?.title}”?
                           </AlertDialogTitle>
                           <AlertDialogDescription>
                             This action cannot be undone.
@@ -404,7 +404,7 @@ const BookList = () => {
                         <AlertDialogFooter>
                           <AlertDialogCancel>Cancel</AlertDialogCancel>
                           <AlertDialogAction
-                            onClick={() => handleDelete(book._id)}
+                            onClick={() => handleDelete(book?._id)}
                           >
                             Confirm
                           </AlertDialogAction>

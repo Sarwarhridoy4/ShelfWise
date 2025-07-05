@@ -10,6 +10,7 @@ export default function Footer() {
   const links = [
     { to: "/", label: "Home" },
     { to: "/books", label: "Books" },
+    { to: "/create-book", label: "Add A New Book" },
     { to: "/borrow-summary", label: "Summary" },
     { to: "/", label: "About" },
   ];

@@ -103,13 +103,13 @@ const BookDetails: React.FC = () => {
 
   const borrowSubmit = async (values: BorrowFormValues) => {
     const book = bookWrapper?.data;
-    if (!book || !values.dueDate) return;
+    if (!book || !values?.dueDate) return;
 
     try {
       await borrowBook({
         book: book._id,
-        quantity: values.quantity,
-        dueDate: format(values.dueDate, "yyyy-MM-dd"),
+        quantity: values?.quantity,
+        dueDate: format(values?.dueDate, "yyyy-MM-dd"),
       }).unwrap();
 
       toast.success("Borrow confirmed 🚀");

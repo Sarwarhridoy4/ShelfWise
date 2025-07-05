@@ -84,7 +84,7 @@ export interface IBookQuery {
   page?: number; // 1‑based page index
   limit?: number; // docs per page
   sort?: "asc" | "desc"; // ascending / descending by createdAt
-  search?: string; // full‑text search
+  search?: string;
   genre?: string;
   author?: string;
 }

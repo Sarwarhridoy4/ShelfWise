@@ -1,4 +1,4 @@
-import { Link, NavLink } from "react-router";
+import { Link, NavLink, useLocation } from "react-router-dom";
 import {
   NavigationMenu,
   NavigationMenuList,
@@ -8,99 +8,98 @@ import {
 import { Sheet, SheetTrigger, SheetContent } from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Menu } from "lucide-react";
-import clsx from "clsx";
 import { ModeToggle } from "@/components/mode-toggle";
+import { motion } from "framer-motion";
 
-/* ----- helper classes --------------------------------------------- */
-const desktopNavClasses = ({ isActive }: { isActive: boolean }) =>
-  clsx(
-    "relative px-4 py-2 text-sm font-medium transition-colors duration-200",
-    "hover:text-primary",
-    isActive ? "text-primary" : "text-muted-foreground",
-
-    // simple underline
-    "after:absolute after:left-0 after:bottom-0 after:h-[2px] after:bg-primary",
-    isActive ? "after:w-full" : "after:w-0 hover:after:w-full",
-    "after:transition-[width] after:duration-300"
-  );
-
-const mobileNavClasses = ({ isActive }: { isActive: boolean }) =>
-  clsx(
-    "relative text-base font-medium rounded-md px-3 py-2 transition-colors",
-    "hover:text-primary",
-
-    // animated rainbow underline
-    "after:absolute after:left-0 after:bottom-0 after:h-[3px] after:rounded-full",
-    "after:bg-gradient-to-r after:from-pink-500 after:via-yellow-500 after:to-purple-500",
-    "after:bg-[length:200%_100%] after:[animation:gradient-x_4s_ease-in-out_infinite]",
-    isActive
-      ? "text-primary after:w-full"
-      : "text-muted-foreground after:w-0 hover:after:w-full",
-    "after:transition-[width] after:duration-300"
-  );
+const navLinks = [
+  { to: "/", label: "Home" },
+  { to: "/books", label: "Books" },
+  { to: "/borrow-summary", label: "Summary" },
+  { to: "/create-book", label: "Add a New Book" },
+];
 
 export default function Navbar() {
-  const links = [
-    { to: "/", label: "Home" },
-    { to: "/books", label: "Books" },
-    { to: "/borrow-summary", label: "Summary" },
-    { to: "/create-book", label: "Add a New Book" },
-  ];
+  const location = useLocation();
 
   return (
     <header className='sticky top-0 z-50 w-full border-b bg-background/70 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm'>
       <div className='mx-auto flex h-16 max-w-7xl items-center justify-between px-4'>
-        {/* Logo */}
         <Link
           to='/'
-          className='text-2xl font-bold tracking-tight hover:opacity-90 transition-opacity'
+          className='text-2xl font-bold tracking-tight transition-opacity hover:opacity-90'
         >
           ShelfWise
         </Link>
 
-        {/* Desktop navigation */}
-        <nav className='hidden md:block'>
+        <nav className='hidden md:block relative'>
           <NavigationMenu>
-            <NavigationMenuList>
-              {links.map(({ to, label }) => (
-                <NavigationMenuItem key={to}>
-                  <NavigationMenuLink asChild>
-                    <NavLink to={to} className={desktopNavClasses}>
-                      {label}
-                    </NavLink>
-                  </NavigationMenuLink>
-                </NavigationMenuItem>
-              ))}
+            <NavigationMenuList className='flex space-x-6 relative'>
+              {navLinks?.map(({ to, label }) => {
+                const isActive = location?.pathname === to;
+                return (
+                  <NavigationMenuItem key={to}>
+                    <NavigationMenuLink asChild>
+                      <NavLink
+                        to={to}
+                        className='relative px-1.5 py-2 text-sm font-medium transition-colors duration-200 hover:text-primary'
+                      >
+                        {label}
+                        {isActive && (
+                          <motion.span
+                            layoutId='underline'
+                            initial={{ opacity: 0, y: "-90%" }}
+                            animate={{ opacity: 1, y: "0%" }}
+                            exit={{ opacity: 0 }}
+                            transition={{ duration: 0.35, ease: "easeOut" }}
+                            className='absolute left-0 right-0 -bottom-1 h-[3px] rounded-full
+                                       bg-gradient-to-r from-pink-500 via-yellow-500 to-purple-500
+                                       bg-[length:200%_100%] [animation:gradient-x_4s_ease-in-out_infinite]'
+                          />
+                        )}
+                      </NavLink>
+                    </NavigationMenuLink>
+                  </NavigationMenuItem>
+                );
+              })}
             </NavigationMenuList>
           </NavigationMenu>
         </nav>
 
-        {/* Right controls */}
         <div className='flex items-center gap-2'>
           <ModeToggle />
-
-          {/* Mobile sheet */}
           <Sheet>
             <SheetTrigger asChild>
               <Button variant='ghost' size='icon' className='md:hidden'>
                 <Menu className='h-5 w-5' />
               </Button>
             </SheetTrigger>
-
             <SheetContent side='right' className='w-64 p-4'>
-              {/* Logo */}
               <Link
                 to='/'
-                className='text-2xl font-bold tracking-tight hover:opacity-90 transition-opacity mx-5 my-4'
+                className='mx-5 my-4 text-2xl font-bold tracking-tight transition-opacity hover:opacity-90'
               >
                 ShelfWise
               </Link>
               <nav className='grid gap-4 py-4'>
-                {links.map(({ to, label }) => (
-                  <NavLink key={to} to={to} className={mobileNavClasses}>
-                    {label}
-                  </NavLink>
-                ))}
+                {navLinks.map(({ to, label }) => {
+                  const isActive = location.pathname === to;
+                  return (
+                    <NavLink
+                      key={to}
+                      to={to}
+                      className='relative text-base font-medium rounded-md px-3 py-2 transition-colors hover:text-primary'
+                    >
+                      {label}
+                      {isActive && (
+                        <span
+                          className='absolute left-0 right-0 -bottom-1 h-[3px] rounded-full
+                          bg-gradient-to-r from-pink-500 via-yellow-500 to-purple-500
+                          bg-[length:200%_100%] [animation:gradient-x_4s_ease-in-out_infinite]'
+                        />
+                      )}
+                    </NavLink>
+                  );
+                })}
               </nav>
             </SheetContent>
           </Sheet>
