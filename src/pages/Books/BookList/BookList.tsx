@@ -139,11 +139,6 @@ const BookList = () => {
     }
   }, [books, sortBy]);
 
-  /* Keep page in range when limit changes */
-  useEffect(() => {
-    if (page > totalPages) dispatch(setPage(totalPages));
-  }, [page, totalPages, dispatch]);
-
   /* toast on fetch error */
   useEffect(() => {
     if (isError) {

@@ -1,7 +1,9 @@
 // src/redux/store.ts
 import { configureStore } from "@reduxjs/toolkit";
 import { libraryApi } from "./api/libraryApi";
-import bookListFiltersReducer from "./slices/bookListFiltersSlice";
+import bookListFiltersReducer, {
+  filtersStateFromUrl,
+} from "./slices/bookListFiltersSlice";
 import {
   useDispatch,
   useSelector,
@@ -11,7 +13,11 @@ import {
 export const store = configureStore({
   reducer: {
     [libraryApi.reducerPath]: libraryApi.reducer,
-    bookListFilters: bookListFiltersReducer
+    bookListFilters: bookListFiltersReducer,
+  },
+  /* preload just this slice; everything else gets its normal defaults */
+  preloadedState: {
+    bookListFilters: filtersStateFromUrl(),
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(libraryApi.middleware),
