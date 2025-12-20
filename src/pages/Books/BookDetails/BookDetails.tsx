@@ -155,7 +155,7 @@ const BookDetails: React.FC = () => {
               title
             )}`}
             alt={`${title} cover`}
-            className='w-full max-w-[160px] sm:w-40 sm:h-60 object-cover rounded-md border'
+            className='w-full max-w-40 sm:w-40 sm:h-60 object-cover rounded-md border'
           />
 
           <div className='flex flex-col justify-between flex-1 mt-4 sm:mt-5'>

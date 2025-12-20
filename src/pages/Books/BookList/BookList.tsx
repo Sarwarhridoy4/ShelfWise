@@ -224,7 +224,7 @@ const BookList = () => {
           value={String(perPage)}
           onValueChange={(v) => dispatch(setPerPage(Number(v)))}
         >
-          <SelectTrigger className='w-[120px]'>
+          <SelectTrigger className='w-30'>
             <SelectValue placeholder='Per page' />
           </SelectTrigger>
           <SelectContent>
@@ -240,7 +240,7 @@ const BookList = () => {
           value={sortBy}
           onValueChange={(v) => dispatch(setSortBy(v as SortBy))}
         >
-          <SelectTrigger className='w-[140px]'>
+          <SelectTrigger className='w-35'>
             <SelectValue placeholder='Sort by' />
           </SelectTrigger>
           <SelectContent>
@@ -272,7 +272,7 @@ const BookList = () => {
                 <TableRow key={book?._id}>
                   <Tooltip>
                     <TooltipTrigger asChild>
-                      <TableCell className='max-w-[200px] truncate'>
+                      <TableCell className='max-w-50 truncate'>
                         {book?.title.length > 25
                           ? `${book?.title.slice(0, 25)}...`
                           : `${book?.title}`}
@@ -312,7 +312,7 @@ const BookList = () => {
                         </Button>
                       </DialogTrigger>
 
-                      <DialogContent className='sm:max-w-[480px] max-h-[90vh] overflow-y-auto'>
+                      <DialogContent className='sm:max-w-120 max-h-[90vh] overflow-y-auto'>
                         <DialogHeader>
                           <DialogTitle>Edit “{selected?.title}”</DialogTitle>
                           <DialogDescription>

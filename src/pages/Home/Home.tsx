@@ -68,7 +68,7 @@ const Home = () => {
             <Link to={feature.to}>
               <div className='relative group rounded-2xl overflow-hidden'>
                 {/* Gradient border effect */}
-                <div className='absolute inset-0 rounded-2xl bg-gradient-to-r from-pink-500 via-yellow-500 to-purple-500 blur-md opacity-0 group-hover:opacity-100 transition-all duration-700 animate-gradient-x' />
+                <div className='absolute inset-0 rounded-2xl bg-linear-to-r from-pink-500 via-yellow-500 to-purple-500 blur-md opacity-0 group-hover:opacity-100 transition-all duration-700 animate-gradient-x' />
 
                 {/* Actual Card */}
                 <Card className='relative z-10 bg-background/80 backdrop-blur-md border border-border group-hover:shadow-2xl transition-all duration-300'>

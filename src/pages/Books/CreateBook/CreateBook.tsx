@@ -23,12 +23,12 @@ import { useAddBookMutation } from "@/redux/api/libraryApi";
 /* ────────────────── Types & schema ────────────────── */
 
 const newBookSchema = z.object({
-  title: z.string().min(1, "Title is required"),
-  author: z.string().min(1, "Author is required"),
-  genre: z.string().min(1, "Genre is required"),
-  isbn: z.string().min(1, "ISBN is required"),
-  description: z.string().optional(),
-  copies: z.coerce.number().int().min(1, "At least one copy"),
+  title: z.string().min(1, { message: "Title is required" }),
+  author: z.string().min(1, { message: "Author is required" }),
+  genre: z.string().min(1, { message: "Genre is required" }),
+  isbn: z.string().min(1, { message: "ISBN is required" }),
+  description: z.string().default(""),
+  copies: z.number().int().min(1, { message: "At least one copy" }),
 });
 
 type NewBookForm = z.infer<typeof newBookSchema>;
@@ -38,18 +38,18 @@ const CreateBook = () => {
   const navigate = useNavigate();
   const [addBook, { isLoading }] = useAddBookMutation();
 
-  const form = useForm<NewBookForm>({
+  const form = useForm({
     resolver: zodResolver(newBookSchema),
     defaultValues: {
       title: "",
       author: "",
-      genre: undefined as unknown as NewBookForm["genre"],
+      genre: "",
       isbn: "",
       description: "",
       copies: 1,
     },
     mode: "onBlur",
-  });
+  } as const);
 
   const onSubmit = useCallback(
     async (data: NewBookForm) => {
@@ -61,13 +61,11 @@ const CreateBook = () => {
         form.reset();
         navigate("/books", { replace: true });
       } catch (err) {
-        toast.error(
-          (err as { data?: { message?: string }; error?: string })?.data
-            ?.message ||
-            (err as { error?: string }).error ||
-            "Failed to add book. Please try again.",
-          { id: tId }
-        );
+        const errorMessage =
+          (err as { data?: { message?: string } })?.data?.message ||
+          (err as { error?: string })?.error ||
+          "Failed to add book. Please try again.";
+        toast.error(errorMessage, { id: tId });
       }
     },
     [addBook, form, navigate]

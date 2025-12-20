@@ -65,7 +65,7 @@ const BorrowSummary = () => {
             <div
               className='
                 absolute inset-0 rounded-xl
-                bg-gradient-to-r from-pink-500 via-yellow-500 to-purple-500
+                bg-linear-to-r from-pink-500 via-yellow-500 to-purple-500
                 opacity-0 group-hover:opacity-100
                 transition-opacity duration-500
                 group-hover:scale-105
