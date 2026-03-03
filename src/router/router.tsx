@@ -1,34 +1,43 @@
 // src/router.tsx
 import { createBrowserRouter } from "react-router";
+import { Suspense, lazy } from "react";
+
 // Layout
 import Main from "@/Layout/Main/Main";
-// Top‑level pages
-import Home from "@/pages/Home/Home";
-// Books
-import CreateBook from "@/pages/Books/CreateBook/CreateBook";
-import BookDetails from "@/pages/Books/BookDetails/BookDetails";
-import BookList from "@/pages/Books/BookList/BookList";
-// Borrowing
-import BorrowSummary from "@/pages/Borrow/BorrowSummary/BorrowSummary";
-import ErrorPage from "@/components/Shared/ErrorPage/ErrorPage";
+
+// Lazy-loaded pages
+const Home = lazy(() => import("@/pages/Home/Home"));
+const CreateBook = lazy(() => import("@/pages/Books/CreateBook/CreateBook"));
+const BookDetails = lazy(() => import("@/pages/Books/BookDetails/BookDetails"));
+const BookList = lazy(() => import("@/pages/Books/BookList/BookList"));
+const BorrowSummary = lazy(() => import("@/pages/Borrow/BorrowSummary/BorrowSummary"));
+
+// Lazy load ErrorPage for better error handling
+const ErrorPage = lazy(() => import("@/components/Shared/ErrorPage/ErrorPage"));
+
+// Loading fallback
+const PageLoader = () => (
+  <div className="flex items-center justify-center min-h-[50vh]">
+    <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+  </div>
+);
 
 export const router = createBrowserRouter([
   {
     path: "/",
     Component: Main,
-    errorElement: <ErrorPage />,
+    errorElement: <Suspense fallback={<PageLoader />}><ErrorPage /></Suspense>,
     children: [
       // Home (index)
-      { index: true, Component: Home },
+      { index: true, element: <Suspense fallback={<PageLoader />}><Home /></Suspense> },
 
       // Books
-      { path: "books", Component: BookList }, // /books
-      { path: "create-book", Component: CreateBook }, // /create-book
-      { path: "books/:id", Component: BookDetails }, // /books/123
+      { path: "books", element: <Suspense fallback={<PageLoader />}><BookList /></Suspense> },
+      { path: "create-book", element: <Suspense fallback={<PageLoader />}><CreateBook /></Suspense> },
+      { path: "books/:id", element: <Suspense fallback={<PageLoader />}><BookDetails /></Suspense> },
 
       // Borrowing
-
-      { path: "borrow-summary", Component: BorrowSummary }, // /borrow-summary
+      { path: "borrow-summary", element: <Suspense fallback={<PageLoader />}><BorrowSummary /></Suspense> },
     ],
   },
 ]);

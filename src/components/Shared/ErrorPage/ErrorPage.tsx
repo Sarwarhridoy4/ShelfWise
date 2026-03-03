@@ -46,7 +46,7 @@ export default function ErrorPage({
     >
       {/* Decorative blurred gradient blob */}
       <div className='pointer-events-none absolute inset-0 -z-10'>
-        <div className='absolute -top-20 left-1/2 size-[720px] -translate-x-1/2 rounded-full bg-gradient-to-tr from-primary/30 via-pink-500/20 to-yellow-400/20 blur-3xl lg:size-[960px]' />
+        <div className='absolute -top-20 left-1/2 size-180 -translate-x-1/2 rounded-full bg-linear-to-tr from-primary/30 via-pink-500/20 to-yellow-400/20 blur-3xl lg:size-240' />
       </div>
 
       <Card className='w-full max-w-md border-0 bg-background/60 backdrop-blur-md'>
