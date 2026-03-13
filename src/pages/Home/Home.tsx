@@ -127,7 +127,7 @@ const Home = () => {
       {/* ── Hadith of the Day ────────────────────────────────────── */}
       <section className='text-center space-y-6'>
         <div className='flex flex-col items-center'>
-          <h2 className='text-3xl md:text-4xl font-extrabold tracking-tight'>
+          <h2 className='text-3xl md:text-4xl font-extrabold tracking-tight my-10'>
             Hadith of the Day
           </h2>
           {loading ? (
