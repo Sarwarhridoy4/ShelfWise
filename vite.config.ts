@@ -1,6 +1,6 @@
 import path from "path"
 import tailwindcss from "@tailwindcss/vite"
-import react from "@vitejs/plugin-react-swc"
+import react from "@vitejs/plugin-react"
 import { defineConfig } from "vite"
 
 // https://vite.dev/config/
@@ -15,8 +15,16 @@ export default defineConfig({
     chunkSizeWarningLimit: 600,
     rollupOptions: {
       output: {
-        manualChunks: {
-          "vendor-react": ["react", "react-dom", "react-router"],
+        manualChunks: (id) => {
+          if (id.includes('node_modules/react') || 
+              id.includes('node_modules/react-dom') || 
+              id.includes('node_modules/react-router')) {
+            return 'vendor-react';
+          }
+          // Optional: split other large libraries
+          if (id.includes('node_modules/lucide-react')) {
+            return 'vendor-lucide';
+          }
         },
       },
     },
