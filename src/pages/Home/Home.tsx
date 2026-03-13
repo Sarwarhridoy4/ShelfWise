@@ -1,8 +1,18 @@
-// src/pages/Home.tsx
 import { Link } from "react-router";
 import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
+
+interface Hadith {
+  id: string;
+  hadith: string;
+  narrator: string;
+  source: string;
+  reference: string;
+  createdAt: null | string;
+  updatedAt: null | string;
+}
 
 const features = [
   {
@@ -32,6 +42,32 @@ const features = [
 ];
 
 const Home = () => {
+  const [hadith, setHadith] = useState<Hadith | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchHadith = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch("https://daily-hadith-one.vercel.app/api/random-hadith");
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      const data = await response.json();
+      setHadith(data);
+    } catch (err) {
+      console.error("Failed to fetch hadith:", err);
+      setError(err instanceof Error ? err.message : "An unknown error occurred");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchHadith();
+  }, []);
+
   return (
     <main className='container mx-auto px-4 py-20 flex flex-col gap-20'>
       {/* ── Hero ─────────────────────────────────────────────── */}
@@ -85,6 +121,54 @@ const Home = () => {
             </Link>
           </motion.div>
         ))}
+      </section>
+
+      {/* ── Hadith of the Day ────────────────────────────────────── */}
+      <section className='text-center space-y-6'>
+        <div className='flex flex-col items-center'>
+          <h2 className='text-3xl md:text-4xl font-extrabold tracking-tight'>
+            Hadith of the Day
+          </h2>
+          {loading ? (
+            <p className='text-lg text-muted-foreground'>Loading hadith...</p>
+          ) : error ? (
+            <p className='text-lg text-destructive'>Failed to load hadith. Please try again later.</p>
+          ) : hadith ? (
+            <>
+              <div className='relative group rounded-2xl overflow-hidden w-full max-w-2xl'>
+                {/* Gradient border effect */}
+                <div className='absolute inset-0 rounded-2xl bg-linear-to-r from-pink-500 via-yellow-500 to-purple-500 blur-md opacity-0 group-hover:opacity-100 transition-all duration-700 animate-gradient-x' />
+
+                {/* Actual Card */}
+                <Card className='relative z-10 bg-background/80 backdrop-blur-md border border-border group-hover:shadow-2xl transition-all duration-300'>
+                  <CardHeader>
+                    <CardTitle>Hadith</CardTitle>
+                  </CardHeader>
+                  <CardContent className='space-y-2 text-sm text-muted-foreground'>
+                    <p className='italic'>"{hadith.hadith}"</p>
+                    <p className='font-medium'>— {hadith.narrator}</p>
+                    <p className='text-xs text-muted-foreground'>
+                      {hadith.source}, {hadith.reference}
+                    </p>
+                  </CardContent>
+                </Card>
+              </div>
+              
+              {/* Refresh Button */}
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="mt-4"
+                onClick={fetchHadith}
+                disabled={loading}
+              >
+                {loading ? "Refreshing..." : "Refresh Hadith"}
+              </Button>
+            </>
+          ) : (
+            <p>No hadith available.</p>
+          )}
+        </div>
       </section>
     </main>
   );
