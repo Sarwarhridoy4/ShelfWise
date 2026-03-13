@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface Hadith {
   id: string;
@@ -130,7 +131,11 @@ const Home = () => {
             Hadith of the Day
           </h2>
           {loading ? (
-            <p className='text-lg text-muted-foreground'>Loading hadith...</p>
+            <div className='space-y-4'>
+              <Skeleton className='h-8 w-56' />
+              <Skeleton className='h-6 w-48' />
+              <Skeleton className='h-4 w-32' />
+            </div>
           ) : error ? (
             <p className='text-lg text-destructive'>Failed to load hadith. Please try again later.</p>
           ) : hadith ? (
