@@ -1,6 +1,6 @@
 // src/components/Footer.tsx
 import { Link } from "react-router";
-import { Github, Mail, Linkedin } from "lucide-react";
+import {GitBranch, Mail, Radio} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 
@@ -62,7 +62,7 @@ export default function Footer() {
                   target='_blank'
                   rel='noreferrer'
                 >
-                  <Github className='h-5 w-5' />
+                  <GitBranch className='h-5 w-5' />
                 </a>
               </Button>
               <Button asChild size='icon' variant='ghost' aria-label='Twitter'>
@@ -71,7 +71,9 @@ export default function Footer() {
                   target='_blank'
                   rel='noreferrer'
                 >
-                  <Linkedin className='h-5 w-5' />
+                  
+                  <Radio className='h-5 w-5'/>
+                  
                 </a>
               </Button>
               <Button asChild size='icon' variant='ghost' aria-label='Email'>
