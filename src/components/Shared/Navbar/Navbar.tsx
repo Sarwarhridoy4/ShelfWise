@@ -1,4 +1,4 @@
-import { Link, NavLink, useLocation } from "react-router-dom";
+import { Link, NavLink, useLocation } from "react-router";
 import {
   NavigationMenu,
   NavigationMenuList,
@@ -22,7 +22,7 @@ export default function Navbar() {
   const location = useLocation();
 
   return (
-    <header className='sticky top-0 z-50 w-full border-b bg-background/70 backdrop-blur supports-[backdrop-filter]:bg-background/60 shadow-sm'>
+    <header className='sticky top-0 z-50 w-full border-b bg-background/70 backdrop-blur supports-backdrop-filter:bg-background/60 shadow-sm'>
       <div className='mx-auto flex h-16 max-w-7xl items-center justify-between px-4'>
         <Link
           to='/'
@@ -51,9 +51,9 @@ export default function Navbar() {
                             animate={{ opacity: 1, y: "0%" }}
                             exit={{ opacity: 0 }}
                             transition={{ duration: 0.35, ease: "easeOut" }}
-                            className='absolute left-0 right-0 -bottom-1 h-[3px] rounded-full
-                                       bg-gradient-to-r from-pink-500 via-yellow-500 to-purple-500
-                                       bg-[length:200%_100%] [animation:gradient-x_4s_ease-in-out_infinite]'
+                            className='absolute left-0 right-0 -bottom-1 h-0.75 rounded-full
+                                       bg-linear-to-r from-pink-500 via-yellow-500 to-purple-500
+                                       bg-size-[200%_100%] animate-[gradient-x_4s_ease-in-out_infinite]'
                           />
                         )}
                       </NavLink>
@@ -92,9 +92,9 @@ export default function Navbar() {
                       {label}
                       {isActive && (
                         <span
-                          className='absolute left-0 right-0 -bottom-1 h-[3px] rounded-full
-                          bg-gradient-to-r from-pink-500 via-yellow-500 to-purple-500
-                          bg-[length:200%_100%] [animation:gradient-x_4s_ease-in-out_infinite]'
+                          className='absolute left-0 right-0 -bottom-1 h-0.75 rounded-full
+                          bg-linear-to-r from-pink-500 via-yellow-500 to-purple-500
+                          bg-size-[200%_100%] animate-[gradient-x_4s_ease-in-out_infinite]'
                         />
                       )}
                     </NavLink>
