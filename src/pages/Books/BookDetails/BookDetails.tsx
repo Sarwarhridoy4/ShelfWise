@@ -268,7 +268,6 @@ const BookDetails: React.FC = () => {
                                   onSelect={(date) =>
                                     field.onChange(date ?? null)
                                   }
-                                  initialFocus
                                   disabled={(date) => date < new Date()}
                                 />
                               </PopoverContent>
