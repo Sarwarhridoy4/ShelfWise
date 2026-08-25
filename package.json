@@ -41,7 +41,7 @@
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.6.0",
     "tailwindcss": "^4.3.2",
-    "vercel": "^58.1.0",
+    "vercel": "^59.4.0",
     "zod": "^4.4.3"
   },
   "devDependencies": {
